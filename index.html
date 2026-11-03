@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827"><title>Pocket Grader</title>
+<style>
+:root{--bg:#0b1020;--panel:#151d31;--panel2:#1b2740;--line:#2a3856;--muted:#9aabc7;--txt:#f4f7ff;--cyan:#56d8e8;--violet:#a78bfa;--green:#65d6a5;--amber:#f6c66b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#25345b 0,transparent 45%),var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:18px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.brand{display:flex;gap:11px;align-items:center}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:grid;place-items:center;color:#10182a;font-size:23px;font-weight:900}.brand b{font-size:19px;letter-spacing:.2px}.brand small{display:block;color:var(--muted);font-size:11px}.pill{border:1px solid #3a4a69;color:#cbd8f1;border-radius:99px;padding:6px 10px;font-size:11px}
+h1{font-size:29px;line-height:1.1;margin:8px 0}h2{font-size:17px;margin:0 0 12px}.sub{color:var(--muted);margin:8px 0 20px}.tabs{display:flex;gap:7px;overflow:auto;margin:18px 0}.tab{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--muted);padding:9px 13px;border-radius:12px}.tab.active{background:#243451;color:white;border-color:#50668e}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{background:linear-gradient(160deg,#19243b,#121a2c);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}.wide{grid-column:1/-1}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}.btn{border:0;border-radius:12px;padding:12px 15px;font-weight:700;background:linear-gradient(100deg,var(--cyan),#93e7dc);color:#0b1826;cursor:pointer}.btn.secondary{background:#263653;color:#eaf1ff;border:1px solid #405578}.btn.ghost{background:transparent;color:#cbd8f1;border:1px solid var(--line)}.btn:disabled{opacity:.4;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap}.preview{height:220px;border:1px dashed #506284;border-radius:14px;background:repeating-linear-gradient(135deg,#17233a,#17233a 12px,#1b2942 12px,#1b2942 24px);display:grid;place-items:center;overflow:hidden;position:relative}.preview img{max-width:100%;max-height:100%;object-fit:contain}.preview video{width:100%;height:100%;object-fit:contain}.preview .overlay{position:absolute;inset:10%;border:2px solid var(--cyan);border-radius:12px;pointer-events:none;box-shadow:0 0 0 999px #08101b55}.camera{display:none}.field{display:flex;flex-direction:column;gap:5px;margin:8px 0}.field label{font-size:12px;color:#b9c8e2}.field input,.field select{width:100%;background:#0e1729;border:1px solid #354766;border-radius:10px;padding:10px;color:white;font:inherit}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.score{font-size:27px;font-weight:800}.score small{font-size:12px;color:var(--muted);font-weight:500}.bar{height:8px;background:#293750;border-radius:9px;overflow:hidden;margin:7px 0}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));width:50%}.metric{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-top:9px}.grade{font-size:24px;font-weight:800;color:var(--green)}.gradebox{background:#101a2b;border:1px solid #31425f;border-radius:13px;padding:12px}.notice{background:#2b2619;border:1px solid #68552b;color:#f4d89a;padding:11px;border-radius:12px;font-size:12px;margin-top:10px}.hidden{display:none!important}.foot{color:#7f91af;font-size:11px;text-align:center;margin:24px 0}.link{color:var(--cyan)}@media(max-width:560px){.wrap{padding:14px 12px 36px}.grid{grid-template-columns:1fr}.wide{grid-column:auto}h1{font-size:25px}.preview{height:205px}}
+</style></head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">✦</div><div><b>Pocket Grader</b><small>SCAN · ANALYSE · VALUE</small></div></div><span class="pill">BETA MOCKUP</span></header>
+<h1>Your card. Under the microscope.</h1><p class="sub">Scan both sides, measure centering and compare estimated grades across the major grading companies.</p>
+<nav class="tabs"><button class="tab active" data-tab="scan">① Scan</button><button class="tab" data-tab="centering">② Centering</button><button class="tab" data-tab="condition">③ AI condition</button><button class="tab" data-tab="grades">④ Grades</button><button class="tab" data-tab="value">⑤ Value</button></nav>
+
+<section id="scan">
+<div class="card"><h2>Card details</h2><div class="split"><div class="field"><label>Card name</label><input id="cardName" value="Charizard ex" placeholder="e.g. Charizard ex"></div><div class="field"><label>Set / number</label><input id="cardSet" placeholder="e.g. 199/165"></div></div><div class="field"><label>Language</label><select id="cardLanguage"><option>English</option><option>Japanese</option><option>Other</option></select></div></div>
+<div class="grid">
+<div class="card"><h2>Front scan</h2><div class="preview" id="frontPreview"><span class="muted">Front photo preview</span><div class="overlay hidden" id="frontOverlay"></div></div><div class="actions" style="margin-top:10px"><button class="btn" onclick="openCamera('front')">Use camera</button><label class="btn secondary" for="frontFile">Choose front photo</label><input id="frontFile" type="file" accept="image/*,.heic,.heif" style="display:block;width:100%;margin-top:8px;color:#cbd8f1;font-size:12px"></div><p class="tiny" id="frontStatus">No front image added yet</p></div>
+<div class="card"><h2>Back scan</h2><div class="preview" id="backPreview"><span class="muted">Back photo preview</span><div class="overlay hidden" id="backOverlay"></div></div><div class="actions" style="margin-top:10px"><button class="btn" onclick="openCamera('back')">Use camera</button><label class="btn secondary" for="backFile">Choose back photo</label><input id="backFile" type="file" accept="image/*,.heic,.heif" style="display:block;width:100%;margin-top:8px;color:#cbd8f1;font-size:12px"></div><p class="tiny" id="backStatus">No back image added yet</p></div></div>
+<div class="card" id="edgeAdjustCard">
+<h2>Adjust detected card edges</h2>
+<p class="tiny">The solid outer box follows the physical card edge. The dashed inner guide and centre lines show the area used for border measurements. Drag the four outer corner handles to correct the card boundary.</p>
+<div class="field"><label>Choose side</label><select id="edgeSide"><option value="front">Front</option><option value="back">Back</option></select></div>
+<div class="preview" id="edgePreview" style="height:300px;background:#091321">
+<span class="muted" id="edgePlaceholder">Scan or upload a card to see its outline here</span>
+<img id="edgeImage" class="hidden" alt="Card edge adjustment preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain">
+<svg id="edgeSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;touch-action:none">
+<!-- Outer cyan line = detected physical card edge; inner amber guides = measurement area -->
+<polygon id="edgePoly" points="15,8 85,8 85,92 15,92" fill="#56d8e8" fill-opacity=".07" stroke="#56d8e8" stroke-width="1.3" vector-effect="non-scaling-stroke"/>
+<polygon id="measurePoly" points="20,14 80,14 80,86 20,86" fill="none" stroke="#f6c66b" stroke-width="1.1" stroke-dasharray="3 2" vector-effect="non-scaling-stroke"/>
+<line id="measureV" x1="50" y1="14" x2="50" y2="86" stroke="#f6c66b" stroke-width=".7" stroke-dasharray="2 2" vector-effect="non-scaling-stroke"/>
+<line id="measureH" x1="20" y1="50" x2="80" y2="50" stroke="#f6c66b" stroke-width=".7" stroke-dasharray="2 2" vector-effect="non-scaling-stroke"/>
+<g id="edgeHandles" fill="#56d8e8" stroke="#101827" stroke-width="1.1" vector-effect="non-scaling-stroke">
+<circle data-corner="0" cx="15" cy="8" r="2.8"/><circle data-corner="1" cx="85" cy="8" r="2.8"/><circle data-corner="2" cx="85" cy="92" r="2.8"/><circle data-corner="3" cx="15" cy="92" r="2.8"/>
+</g></svg></div>
+<div class="actions" style="margin-top:10px"><button class="btn secondary" onclick="resetEdges()">Reset outline</button><button class="btn" onclick="confirmEdges()">Confirm edges</button></div>
+<div class="tiny" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px"><span><span style="color:#56d8e8">━━</span> Card edge</span><span><span style="color:#f6c66b">┄┄</span> Inner measurement guide</span></div><p class="tiny" id="edgeStatus">Drag the four blue handles to adjust the detected boundary.</p>
+</div>
+<div class="card hidden" id="cameraCard"><h2>Camera scanner</h2><div class="preview"><video id="video" autoplay playsinline></video><div class="overlay"></div></div><p class="tiny">Place the full card inside the guide. Keep the camera parallel to the card and use even lighting.</p><div class="actions"><button class="btn" onclick="capture()">Capture photo</button><button class="btn ghost" onclick="closeCamera()">Close camera</button></div><canvas id="captureCanvas" class="hidden"></canvas></div>
+<div class="card"><div class="actions"><button class="btn" onclick="analyse()">Detect edges & analyse both sides</button><button class="btn ghost" onclick="demo()">Load demo scores</button></div><p class="tiny">Edge detection is a prototype preview. For reliable measurements, keep all four card edges visible and avoid glare or sleeves.</p><div id="scanResult" class="tiny muted">Add front and back images to begin.</div></div>
+</section>
+
+<section id="centering" class="hidden">
+<div class="card"><h2>Centering measurements</h2><p class="tiny">Manual mode: enter each border as a percentage out of 100. Left + right must equal 100, and top + bottom must equal 100. Example: L45 / R55 and T48 / B52.</p>
+<div class="grid"><div class="card"><h2>Front centering</h2><div class="split"><div class="field"><label>Left %</label><input type="number" min="0" max="100" id="fl" value="50"></div><div class="field"><label>Right %</label><input type="number" min="0" max="100" id="fr" value="50"></div><div class="field"><label>Top %</label><input type="number" min="0" max="100" id="ft" value="50"></div><div class="field"><label>Bottom %</label><input type="number" min="0" max="100" id="fb" value="50"></div></div><div id="frontCenter" class="metric"><span>Front centering score</span><b>100 / 100</b></div></div>
+<div class="card"><h2>Back centering</h2><div class="split"><div class="field"><label>Left %</label><input type="number" min="0" max="100" id="bl" value="50"></div><div class="field"><label>Right %</label><input type="number" min="0" max="100" id="br" value="50"></div><div class="field"><label>Top %</label><input type="number" min="0" max="100" id="bt" value="50"></div><div class="field"><label>Bottom %</label><input type="number" min="0" max="100" id="bb" value="50"></div></div><div id="backCenter" class="metric"><span>Back centering score</span><b>100 / 100</b></div></div></div>
+<div class="notice">Centering score is a proportionality indicator, not a professional grade. Company tolerances differ and grading also depends on corners, edges and surface.</div></div>
+</section>
+
+<section id="condition" class="hidden">
+<div class="card"><h2>AI condition assessment</h2>
+<p class="tiny">Prototype assessment panel for front and back image review. In the production app, a vision model will inspect high-resolution crops for whitening, scratches, dents, print lines, corner wear and edge chipping.</p>
+<div class="grid">
+<div class="card"><h2>Front condition</h2>
+<div class="field"><label>Surface</label><select id="frontSurface"><option value="10">Clean / no visible defects</option><option value="9">Very light marks</option><option value="8">Light scratches or print marks</option><option value="6">Noticeable scratches / dents</option><option value="4">Heavy wear</option></select></div>
+<div class="field"><label>Corners</label><select id="frontCorners"><option value="10">Sharp, clean corners</option><option value="9">Very slight wear</option><option value="8">Minor whitening / softening</option><option value="6">Visible corner wear</option><option value="4">Heavy damage</option></select></div>
+<div class="field"><label>Edges</label><select id="frontEdges"><option value="10">Clean edges</option><option value="9">Tiny imperfections</option><option value="8">Minor whitening / chipping</option><option value="6">Visible edge wear</option><option value="4">Heavy chipping</option></select></div></div>
+<div class="card"><h2>Back condition</h2>
+<div class="field"><label>Surface</label><select id="backSurface"><option value="10">Clean / no visible defects</option><option value="9">Very light marks</option><option value="8">Light scratches or print marks</option><option value="6">Noticeable scratches / dents</option><option value="4">Heavy wear</option></select></div>
+<div class="field"><label>Corners</label><select id="backCorners"><option value="10">Sharp, clean corners</option><option value="9">Very slight wear</option><option value="8">Minor whitening / softening</option><option value="6">Visible corner wear</option><option value="4">Heavy damage</option></select></div>
+<div class="field"><label>Edges</label><select id="backEdges"><option value="10">Clean edges</option><option value="9">Tiny imperfections</option><option value="8">Minor whitening / chipping</option><option value="6">Visible edge wear</option><option value="4">Heavy chipping</option></select></div></div></div>
+<div class="notice">The selectors are manual stand-ins in this demo. They do not analyse pixels or run a trained AI model yet. The production AI needs close-up image processing and validation against real graded cards.</div>
+</div></section>
+<section id="grades" class="hidden"><div class="card"><h2>Estimated grading outcomes</h2><p class="tiny">Illustrative estimates based on centering input only. Add condition checks for corners, edges and surface before relying on a prediction.</p><div class="grid" id="gradeGrid"></div><div class="notice">Not affiliated with PSA, Beckett, CGC or ACE. These are unofficial estimates, not guaranteed grades. Final grades are determined by the grading company.</div></div></section>
+
+<section id="value" class="hidden">
+<div class="card"><h2>eBay sold prices for this card</h2>
+<p class="tiny">Search is built from the card details entered in Scan. Check the set number, language and grade match before using a sale as a comparable.</p>
+<div class="field"><label>Compare against</label><select id="valueGrade"><option value="">Raw / ungraded card</option><option>PSA 10</option><option>PSA 9</option><option>PSA 8</option><option>BGS 10</option><option>BGS 9.5</option><option>CGC 10</option><option>ACE 10</option></select></div>
+<div class="gradebox"><div class="tiny">YOUR CARD SEARCH</div><b id="valueCardQuery">Charizard ex · English</b><p class="tiny" id="valueSearchHint">Add the set number in Scan to narrow the results.</p>
+<a id="ebayLink" class="btn" href="https://www.ebay.co.uk/sch/i.html?_nkw=Charizard+ex&LH_Sold=1&LH_Complete=1" target="_blank" rel="noopener">View latest sold listings on eBay ↗</a></div>
+<div class="notice"><b>Live sold data:</b> eBay's official Marketplace Insights API can return sold items and sale dates for up to 90 days, but it is a limited-release API requiring eBay approval. This prototype opens the matching eBay sold search; it does not yet import sold prices automatically.</div>
+</div>
+<div class="card"><h2>Record the latest sold comps</h2><p class="tiny">Enter the latest matching sold prices you see on eBay. Pocket Grader will calculate the average and number of comps recorded.</p>
+<div class="grid"><div class="field"><label>Sold price 1 (£)</label><input type="number" step="0.01" min="0" id="p1" placeholder="e.g. 42.50"></div><div class="field"><label>Sold price 2 (£)</label><input type="number" step="0.01" min="0" id="p2" placeholder="e.g. 39.99"></div><div class="field"><label>Sold price 3 (£)</label><input type="number" step="0.01" min="0" id="p3" placeholder="e.g. 45.00"></div><div class="field"><label>Sold price 4 (£)</label><input type="number" step="0.01" min="0" id="p4" placeholder="e.g. 41.00"></div><div class="field"><label>Sold price 5 (£)</label><input type="number" step="0.01" min="0" id="p5" placeholder="e.g. 43.00"></div><div class="field"><label>Sold price 6 (£)</label><input type="number" step="0.01" min="0" id="p6" placeholder="e.g. 40.00"></div></div>
+<button class="btn" onclick="calcValue()">Calculate market value</button><div class="gradebox" style="margin-top:12px"><span class="tiny">AVERAGE OF RECORDED SOLD COMPS</span><div class="score" id="avgPrice">£—</div><span class="tiny" id="compCount">No sold prices entered</span></div><p class="tiny">Use individual card sales, not bundles or lots. Keep raw and graded sales separate.</p></div></section>
+<p class="foot">Pocket Grader · Prototype concept · Estimates only</p></main>
+<script>
+let stream=null,side='front',images={front:null,back:null};
+const $=id=>document.getElementById(id);
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['scan','centering','condition','grades','value'].forEach(t=>$(t).classList.toggle('hidden',t!==b.dataset.tab));if(b.dataset.tab==='grades')renderGrades();if(b.dataset.tab==='value')updateEbay()}));
+let edgePoints=[[15,8],[85,8],[85,92],[15,92]],dragCorner=-1,edgeConfirmed=false;
+function drawEdges(){
+ $('edgePoly').setAttribute('points',edgePoints.map(p=>p.join(',')).join(' '));
+ document.querySelectorAll('#edgeHandles circle').forEach((c,i)=>{c.setAttribute('cx',edgePoints[i][0]);c.setAttribute('cy',edgePoints[i][1]);});
+ // Inset each corner toward the card centre to keep the measurement guides inside the detected edge.
+ const cx=edgePoints.reduce((s,p)=>s+p[0],0)/4, cy=edgePoints.reduce((s,p)=>s+p[1],0)/4;
+ const inner=edgePoints.map(([x,y])=>[x+(cx-x)*0.14,y+(cy-y)*0.14]);
+ $('measurePoly').setAttribute('points',inner.map(p=>p.join(',')).join(' '));
+ const topMid=[(inner[0][0]+inner[1][0])/2,(inner[0][1]+inner[1][1])/2];
+ const bottomMid=[(inner[3][0]+inner[2][0])/2,(inner[3][1]+inner[2][1])/2];
+ const leftMid=[(inner[0][0]+inner[3][0])/2,(inner[0][1]+inner[3][1])/2];
+ const rightMid=[(inner[1][0]+inner[2][0])/2,(inner[1][1]+inner[2][1])/2];
+ $('measureV').setAttribute('x1',topMid[0]);$('measureV').setAttribute('y1',topMid[1]);$('measureV').setAttribute('x2',bottomMid[0]);$('measureV').setAttribute('y2',bottomMid[1]);
+ $('measureH').setAttribute('x1',leftMid[0]);$('measureH').setAttribute('y1',leftMid[1]);$('measureH').setAttribute('x2',rightMid[0]);$('measureH').setAttribute('y2',rightMid[1]);
+}
+function syncEdgeImage(){
+ let which=$('edgeSide').value,src=images[which],img=$('edgeImage');
+ if(src){img.src=src;img.classList.remove('hidden');$('edgePlaceholder').classList.add('hidden');}
+ else{img.classList.add('hidden');$('edgePlaceholder').classList.remove('hidden');}
+}
+function resetEdges(){edgePoints=[[15,8],[85,8],[85,92],[15,92]];drawEdges();edgeConfirmed=false;$('edgeStatus').textContent='Outline reset. Drag the handles to match the card edges.';}
+function confirmEdges(){edgeConfirmed=true;$('edgeStatus').textContent='Outline confirmed for '+$('edgeSide').value+'. In the full app, these corner coordinates feed perspective correction and centering measurement.';}
+$('edgeSide').addEventListener('change',syncEdgeImage);
+$('edgeHandles').addEventListener('pointerdown',e=>{let t=e.target;if(t.dataset.corner===undefined)return;dragCorner=+t.dataset.corner;t.setPointerCapture(e.pointerId);});
+$('edgeHandles').addEventListener('pointermove',e=>{if(dragCorner<0)return;let r=$('edgeSvg').getBoundingClientRect();edgePoints[dragCorner]=[Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100)),Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100))];drawEdges();edgeConfirmed=false;$('edgeStatus').textContent='Outline adjusted. Confirm when the corners line up with the card.';});
+$('edgeHandles').addEventListener('pointerup',()=>dragCorner=-1);
+$('edgeHandles').addEventListener('pointercancel',()=>dragCorner=-1);
+function setImage(which,file){
+ const status=$(which+'Status'),box=$(which+'Preview');
+ if(!file){status.textContent='No photo selected.';return;}
+ status.textContent='Selected: '+(file.name||'photo')+' · '+Math.round(file.size/1024)+' KB · loading preview…';
+ const reader=new FileReader();
+ reader.onload=()=>{
+   const dataUrl=reader.result;
+   const img=new Image();
+   img.alt=which+' card photo';
+   img.style.cssText='max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block';
+   img.onload=()=>{
+     images[which]=dataUrl;
+     box.innerHTML=''; box.appendChild(img);
+     const overlay=document.createElement('div'); overlay.className='overlay'; box.appendChild(overlay);
+     status.textContent='Photo loaded · '+img.naturalWidth+' × '+img.naturalHeight+' px';
+     syncEdgeImage();
+   };
+   img.onerror=()=>{
+     status.textContent='Photo selected ('+(file.name||'image')+'), but this browser cannot preview its format. Try a JPEG copy.';
+     images[which]=dataUrl;
+   };
+   img.src=dataUrl;
+ };
+ reader.onerror=()=>{status.textContent='Photo selected, but the browser could not read it. Try a screenshot or JPEG copy.';};
+ reader.readAsDataURL(file);
+}
+['front','back'].forEach(s=>{
+ const input=$(s+'File');
+ input.addEventListener('change',function(){
+   const file=this.files&&this.files[0];
+   if(file) setImage(s,file);
+   else $(s+'Status').textContent='No photo selected. Please try again.';
+ });
+});
+async function openCamera(s){side=s;try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});$('video').srcObject=stream;$('cameraCard').classList.remove('hidden');$('cameraCard').scrollIntoView({behavior:'smooth'});}catch(e){alert('Camera access was unavailable. Please allow camera permission or use Upload.');}}
+function closeCamera(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}$('cameraCard').classList.add('hidden');}
+function capture(){let v=$('video'),c=$('captureCanvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);c.toBlob(blob=>{let file=new File([blob],side+'.jpg',{type:'image/jpeg'});setImage(side,file);closeCamera();},'image/jpeg',.92);}
+function analyse(){if(!images.front||!images.back){$('scanResult').textContent='Please add both the front and back photos first.';return;}$('scanResult').textContent='Photos loaded. Card outline guide shown. Use manual centering or the AI condition panel; true automatic edge and surface analysis needs the production vision model.';document.querySelector('[data-tab="centering"]').click();}
+function pair(a,b){return Math.max(0,100-Math.abs(a-b));}
+function score(prefix){let a=+$(prefix+'l').value||0,b=+$(prefix+'r').value||0,c=+$(prefix+'t').value||0,d=+$(prefix+'b').value||0;return Math.round((pair(a,b)+pair(c,d))/2);}
+function valid(prefix){let a=+$(prefix+'l').value,b=+$(prefix+'r').value,c=+$(prefix+'t').value,d=+$(prefix+'b').value;return a>=0&&b>=0&&c>=0&&d>=0&&a<=100&&b<=100&&c<=100&&d<=100&&a+b===100&&c+d===100;}
+function updateCenter(){['f','b'].forEach(p=>{let ok=valid(p),el=$(p==='f'?'frontCenter':'backCenter');el.innerHTML='<span>'+(p==='f'?'Front':'Back')+' centering score</span><b>'+(ok?score(p)+' / 100':'Check pairs total 100%')+'</b>';});}
+['fl','fr','ft','fb','bl','br','bt','bb'].forEach(id=>$(id).addEventListener('input',updateCenter));
+function renderGrades(){
+ let fs=valid('f')?score('f'):0,bs=valid('b')?score('b'):0;
+ let centering=(fs+bs)/2;
+ let ids=['frontSurface','frontCorners','frontEdges','backSurface','backCorners','backEdges'];
+ let condition=ids.reduce((sum,id)=>sum+(+$ (id).value),0)/ids.length;
+ // A conservative illustrative blend: centering is one factor; condition is represented by the user's selected condition ratings.
+ let overall=(centering/10*0.25)+(condition*0.75);
+ let estimate=overall>=9.75?'10':overall>=9.2?'9':overall>=8.2?'8':overall>=7.2?'7':overall>=6.2?'6':overall>=5.2?'5':'4 or lower';
+ let names=[['PSA','PSA '+estimate,'Unofficial estimate'],['BGS','BGS '+(overall>=9.7?'9.5':overall>=9.1?'9':overall>=8.2?'8.5':'7.5'),'Unofficial estimate'],['CGC','CGC '+(overall>=9.8?'10':overall>=9.1?'9.5':overall>=8.2?'8.5':'7.5'),'Unofficial estimate'],['ACE','ACE '+(overall>=9.7?'10':overall>=9.1?'9':'8'),'Unofficial estimate']];
+ $('gradeGrid').innerHTML='<div class="gradebox wide"><div class="tiny">COMBINED CONDITION INDICATOR</div><div class="score">'+overall.toFixed(1)+' / 10</div><div class="bar"><span style="width:'+Math.min(100,overall*10)+'%"></span></div><div class="tiny">Centering '+centering.toFixed(0)+'/100 · Visual condition inputs '+condition.toFixed(1)+'/10</div></div>'+names.map(n=>'<div class="gradebox"><div class="tiny">'+n[0]+'</div><div class="grade">'+n[1]+'</div><div class="tiny">'+n[2]+'</div></div>').join('');
+}
+['frontSurface','frontCorners','frontEdges','backSurface','backCorners','backEdges'].forEach(id=>$(id).addEventListener('change',renderGrades));
+function demo(){[['fl',45],['fr',55],['ft',48],['fb',52],['bl',50],['br',50],['bt',49],['bb',51]].forEach(x=>$(x[0]).value=x[1]);updateCenter();$('scanResult').textContent='Demo measurements loaded. Adjust them to match your card.';document.querySelector('[data-tab="centering"]').click();}
+function updateEbay(){let parts=[$('cardName').value,$('cardSet').value,$('cardLanguage').value,$('valueGrade').value].filter(Boolean);let q=parts.join(' ');$('ebayLink').href='https://www.ebay.co.uk/sch/i.html?_nkw='+encodeURIComponent(q)+'&LH_Sold=1&LH_Complete=1&_sop=13';$('valueCardQuery').textContent=parts.join(' · ')||'Enter card details in Scan';$('valueSearchHint').textContent=$('cardSet').value?'Search includes the card name, set/number, language and selected grade.':'Add the set number in Scan to narrow the results.';}
+$('cardName').addEventListener('input',updateEbay);$('cardSet').addEventListener('input',updateEbay);$('cardLanguage').addEventListener('change',updateEbay);$('valueGrade').addEventListener('change',updateEbay);
+function calcValue(){let vals=['p1','p2','p3','p4','p5','p6'].map(x=>parseFloat($(x).value)).filter(x=>Number.isFinite(x)&&x>0);$('avgPrice').textContent=vals.length?'£'+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):'£—';$('compCount').textContent=vals.length+' sold comparison'+(vals.length===1?'':'s')+' included';}
+updateCenter();renderGrades();drawEdges();syncEdgeImage();
+</script></body></html>
