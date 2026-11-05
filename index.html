@@ -157,6 +157,12 @@ body[data-theme="purple-yellow"] .edge-live-tag i{background:#ffd84d;box-shadow:
 <div class="actions edge-actions" style="margin-top:14px"><button class="btn secondary" onclick="resetEdges()">Reset outline</button><button class="btn" onclick="confirmEdges()">Confirm edges</button></div>
 <div class="metric" style="margin-top:12px;flex-wrap:wrap"><span>Measured border balance</span><b id="liveBorderPercent">L 50% / R 50% · T 50% / B 50%</b></div><p class="tiny">Move the cyan lines to mark the actual card edges, then move the amber lines to mark the inner border. Percentages update as you adjust either set and are copied into the selected side’s centering fields.</p>
 <div class="tiny" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px"><span><span data-line-legend="outer" style="color:#56d8e8">━━</span> Card edge (drag outer line)</span><span><span data-line-legend="inner" style="color:#f6c66b">┄┄</span> Inner measurement guide (drag inner line)</span></div><p class="tiny" id="edgeStatus">Use the outline and guide lines to compare the card borders.</p>
+<div class="card" id="centeringGradePanel" style="margin-top:14px;padding:14px;background:linear-gradient(145deg,#102e29,#1d1b38);border:1px solid var(--line)">
+ <div class="edge-workbench-heading"><div><span class="edge-kicker">CENTERING REPORT</span><h3 style="margin:0">Grader estimates</h3></div><span class="edge-live-tag"><i></i> LIVE</span></div>
+ <p class="tiny">Indicative centering-only estimates based on your front and back measurements. Enabled graders are taken from Settings.</p>
+ <div id="centeringGradeResults" class="grid"><div class="gradebox">Adjust your card borders to see centering estimates.</div></div>
+ <p class="tiny" id="centeringGradeNote">These are not official grades. Surface, corners, edges and each company's current grading standards can change the final result.</p>
+</div>
 </div>
 
 
@@ -304,6 +310,7 @@ function updateLiveBorderPercent(){
  const side=$('edgeSide')?.value==='back'?'b':'f';
  [[side+'l',L],[side+'r',R],[side+'t',T],[side+'b',B]].forEach(([id,v])=>{const field=$(id);if(field)field.value=v;});
  if(typeof updateCenter==='function')updateCenter();
+ renderCenteringGrades();
 }
 
 const edgeSvg=$('edgeSvg');
@@ -379,7 +386,7 @@ function syncEdgeImage(){
  else{img.onload=null;img.classList.add('hidden');$('edgePlaceholder').classList.remove('hidden');}
 }
 function resetEdges(){edgePoints=[[0,0],[100,0],[100,100],[0,100]];innerPoints=null;drawEdges();edgeConfirmed=false;$('edgeStatus').textContent='Outline reset. Use the guide lines to compare the borders.';}
-function confirmEdges(){edgeConfirmed=true;$('edgeStatus').textContent='Outline confirmed for '+$('edgeSide').value+'. The photo-fit outline and inner guide are ready for centering comparison.';}
+function confirmEdges(){edgeConfirmed=true;$('edgeStatus').textContent='Outline confirmed for '+$('edgeSide').value+'. Your centering-only grader estimates are shown below.';renderCenteringGrades();$('centeringGradePanel').scrollIntoView({behavior:'smooth',block:'nearest'});}
 $('edgeSide').addEventListener('change',syncEdgeImage);
 
 function setImage(which,file){
@@ -457,6 +464,42 @@ function runPreGrade(){
  const total=centering*.25+surface*.35+corners*.20+edges*.20;
  const rounded=Math.max(1,Math.min(10,total)).toFixed(1);
  $('preGradeResult').innerHTML='<div class="tiny">PRE-GRADE POINT SCORE</div><div class="score">'+rounded+' / 10</div><div class="bar"><span style="width:'+Number(rounded)*10+'%"></span></div><p class="tiny">Centering '+centering.toFixed(1)+' · Surface '+surface.toFixed(1)+' · Corners '+corners.toFixed(1)+' · Edges '+edges.toFixed(1)+'</p><p class="tiny">Use this as a screening estimate before submitting. PSA, Beckett, ACE, CGC and TAG may grade the same card differently.</p>';
+}
+function renderCenteringGrades(){
+ const host=$('centeringGradeResults');if(!host)return;
+ const selected=[...document.querySelectorAll('.grader-choice:checked')].map(el=>el.value);
+ const read=p=>({l:Number($(p+'l').value),r:Number($(p+'r').value),t:Number($(p+'t').value),b:Number($(p+'b').value)});
+ const front=read('f'),back=read('b');
+ const validPair=o=>[o.l+o.r,o.t+o.b].every(v=>v===100);
+ if(!validPair(front)||!validPair(back)){host.innerHTML='<div class="gradebox">Check that each left/right and top/bottom pair totals 100%.</div>';return;}
+ const worstFront=Math.min(front.l,front.r,front.t,front.b);
+ const worstBack=Math.min(back.l,back.r,back.t,back.b);
+ const profiles={
+  PSA:{front:45,back:25,top:'10'},
+  BGS:{front:50,back:45,top:'10'},
+  CGC:{front:50,back:45,top:'10'},
+  ACE:{front:45,back:40,top:'10'},
+  TAG:{front:45,back:40,top:'10'}
+ };
+ const estimate=(company)=>{
+  const p=profiles[company],limit=Math.min(p.front,p.back);
+  const frontLimit=p.front,backLimit=p.back;
+  const frontOver=Math.max(0,frontLimit-worstFront),backOver=Math.max(0,backLimit-worstBack);
+  const over=Math.max(frontOver,backOver);
+  if(over===0)return company==='BGS'?'10': '10';
+  if(over<=5)return company==='BGS'?'9.5':'9';
+  if(over<=10)return company==='BGS'?'9':'8';
+  if(over<=15)return company==='BGS'?'8.5':'7';
+  if(over<=20)return company==='BGS'?'8':'6';
+  return company==='BGS'?'7.5':'5 or below';
+ };
+ if(!selected.length){host.innerHTML='<div class="gradebox">No graders selected. Enable graders in Settings to see estimates.</div>';return;}
+ const rows=selected.map(company=>{
+  const grade=estimate(company);
+  const top=profiles[company];
+  return '<div class="gradebox"><div class="tiny">'+company+'</div><div class="grade">'+company+' '+grade+(grade==='10'?' 💎':'')+'</div><div class="tiny">Front '+worstFront+'% · Back '+worstBack+'%</div><div class="tiny">Indicative top-grade tolerance: front '+top.front+'/'+(100-top.front)+' · back '+top.back+'/'+(100-top.back)+'</div></div>';
+ }).join('');
+ host.innerHTML='<div class="gradebox wide"><div class="tiny">CENTRING BALANCE</div><div class="score">'+worstFront+'% front · '+worstBack+'% back</div><div class="tiny">Lowest measured border share on each side. Closer to 50/50 is more balanced.</div></div>'+rows;
 }
 function renderGrades(){
  let fs=valid('f')?score('f'):0,bs=valid('b')?score('b'):0;
