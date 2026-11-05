@@ -347,7 +347,7 @@ function syncPreGradePhotos(){
    const img=$('pre'+(s==='front'?'Front':'Back')+'Photo');
    const status=$('pre'+(s==='front'?'Front':'Back')+'Status');
    if(images[s]){img.src=images[s];status.textContent=(s==='front'?'Front':'Back')+' photo ready for review.';}
-   else{img.removeAttribute('src');status.textContent='No '+s+' photo captured yet. Go to Scan and use the camera.';}
+   else{img.removeAttribute('src');status.textContent='No '+s+' photo added yet. Use the camera or photo library above.';}
  });
 }
 function runPreGrade(){
