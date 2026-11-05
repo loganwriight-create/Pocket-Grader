@@ -11,7 +11,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   const url = new URL(event.request.url);
-  const isAppShell = event.request.mode === 'navigate' || (url.pathname.endsWith("/index.html") || url.pathname.endsWith("/manifest.webmanifest") || url.pathname.endsWith("/sw.js")).test(url.pathname);
+  const isAppShell = event.request.mode === 'navigate' || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/manifest.webmanifest") || url.pathname.endsWith("/sw.js");
   if (isAppShell) {
     event.respondWith(fetch(event.request).then(response => {
       const copy = response.clone();
