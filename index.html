@@ -234,7 +234,21 @@ body[data-theme="purple-yellow"] .edge-live-tag i{background:#ffd84d;box-shadow:
 }
 
 
-/* Keep the navigation anchored to the viewport while page content scrolls */
+/* Keep the navigation anchored to the viewport while page content scrolls.
+   Do not add the iOS safe-area inset twice: it was creating the large blank
+   strip beneath the buttons and lifting the footer above the screen edge. */
+.tabs {
+  position: fixed !important;
+  top: auto !important;
+  bottom: 7px !important;
+  padding-bottom: 7px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  z-index: 99999 !important;
+}
+body {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+}
 .tabs {
   position: fixed !important;
   top: auto !important;
