@@ -67,12 +67,13 @@ body[data-theme="green-purple"] .link{color:#8ee8bd}
 .theme-option{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;margin:8px 0;cursor:pointer;background:var(--panel2)}.theme-option input{accent-color:var(--violet);width:18px;height:18px}.theme-swatch{width:54px;height:34px;border-radius:8px;border:1px solid #ffffff44;flex-shrink:0}
 
 
-/* A travelling highlight confined to the navigation footer's outer edge */
-.tabs{position:fixed;isolation:isolate;border:1px solid transparent;border-radius:16px 16px 0 0}
-.tabs::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:2;background:conic-gradient(from 0deg,transparent 0deg,transparent 245deg,var(--footer-glow-a,var(--cyan,#56d8e8)) 278deg,#ffffff 292deg,var(--footer-glow-b,var(--amber,#f6c66b)) 310deg,transparent 342deg,transparent 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;filter:drop-shadow(0 0 4px var(--footer-glow-a,var(--cyan,#56d8e8))) drop-shadow(0 0 7px var(--footer-glow-b,var(--amber,#f6c66b)));animation:footerGlowTravel 5s linear infinite,footerGlowPulse 1.8s ease-in-out infinite alternate}
-@keyframes footerGlowTravel{to{transform:rotate(360deg)}}
-@keyframes footerGlowPulse{from{opacity:.35}to{opacity:1}}
-@media(prefers-reduced-motion:reduce){.tabs::before{animation:none;opacity:.75}}
+/* Theme-matched glow pulsing around the complete footer border */
+.tabs{position:fixed;isolation:isolate;border:1px solid var(--footer-glow-a,var(--cyan,#56d8e8));box-shadow:0 -8px 24px rgba(0,0,0,.24),0 0 8px var(--footer-glow-a,var(--cyan,#56d8e8)),inset 0 0 5px color-mix(in srgb,var(--footer-glow-b,var(--amber,#f6c66b)) 28%,transparent);animation:footerEdgePulse 1.8s ease-in-out infinite alternate}
+@keyframes footerEdgePulse{
+  from{border-color:var(--footer-glow-a,var(--cyan,#56d8e8));box-shadow:0 -8px 24px rgba(0,0,0,.24),0 0 5px var(--footer-glow-a,var(--cyan,#56d8e8)),inset 0 0 3px var(--footer-glow-b,var(--amber,#f6c66b))}
+  to{border-color:var(--footer-glow-b,var(--amber,#f6c66b));box-shadow:0 -8px 24px rgba(0,0,0,.24),0 0 15px var(--footer-glow-a,var(--cyan,#56d8e8)),0 0 23px var(--footer-glow-b,var(--amber,#f6c66b)),inset 0 0 9px var(--footer-glow-b,var(--amber,#f6c66b))}
+}
+@media(prefers-reduced-motion:reduce){.tabs{animation:none;border-color:var(--footer-glow-a,var(--cyan,#56d8e8));box-shadow:0 0 10px var(--footer-glow-a,var(--cyan,#56d8e8))}}
 /* Fixed bottom navigation */
 body{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:1000;display:flex;gap:4px;justify-content:space-around;align-items:stretch;margin:0 auto;width:100%;max-width:900px;padding:9px 8px calc(9px + env(safe-area-inset-bottom));background:rgba(13,20,38,.97);border-top:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow-x:auto;box-shadow:0 -8px 24px rgba(0,0,0,.24)}
