@@ -88,10 +88,10 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 
 <section id="scan">
 <div class="card"><h2>Card details</h2><div class="split"><div class="field"><label>Card name</label><input id="cardName" value="Charizard ex" placeholder="e.g. Charizard ex"></div><div class="field"><label>Set / number</label><input id="cardSet" placeholder="e.g. 199/165"></div></div><div class="field"><label>Language</label><select id="cardLanguage"><option>English</option><option>Japanese</option><option>Other</option></select></div></div>
-<div class="grid">
+<div class="grid hidden">
 <div class="card"><h2>Front scan</h2><div class="preview" id="frontPreview"><span class="muted">Front photo preview</span><div class="overlay hidden" id="frontOverlay"></div></div><div class="actions" style="margin-top:10px"><button class="btn" onclick="openCamera('front')">Use camera</button><label class="btn secondary" for="frontFile">Choose front photo</label><input id="frontFile" type="file" accept="image/*,.heic,.heif" style="display:block;width:100%;margin-top:8px;color:#cbd8f1;font-size:12px"></div><p class="tiny" id="frontStatus">No front image added yet</p></div>
 <div class="card"><h2>Back scan</h2><div class="preview" id="backPreview"><span class="muted">Back photo preview</span><div class="overlay hidden" id="backOverlay"></div></div><div class="actions" style="margin-top:10px"><button class="btn" onclick="openCamera('back')">Use camera</button><label class="btn secondary" for="backFile">Choose back photo</label><input id="backFile" type="file" accept="image/*,.heic,.heif" style="display:block;width:100%;margin-top:8px;color:#cbd8f1;font-size:12px"></div><p class="tiny" id="backStatus">No back image added yet</p></div></div>
-<div class="card" id="edgeAdjustCard">
+<div class="card hidden" id="edgeAdjustCard">
 <h2>Adjust detected card edges</h2>
 <p class="tiny">The photo-fit cyan outline starts around the whole image. Drag each cyan line with your finger or mouse to fit the actual card edges, ignoring background. Then drag the amber dashed lines to match the printed inner border. Centre lines help compare left/right and top/bottom borders; no dots are used.</p>
 <div class="field"><label>Choose side</label><select id="edgeSide"><option value="front">Front</option><option value="back">Back</option></select></div>
@@ -109,9 +109,9 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 <div class="metric" style="margin-top:12px;flex-wrap:wrap"><span>Measured border balance</span><b id="liveBorderPercent">L 50% / R 50% · T 50% / B 50%</b></div><p class="tiny">Move the cyan lines to mark the actual card edges, then move the amber lines to mark the inner border. Percentages update as you adjust either set and are copied into the selected side’s centering fields.</p>
 <div class="tiny" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px"><span><span data-line-legend="outer" style="color:#56d8e8">━━</span> Card edge (drag outer line)</span><span><span data-line-legend="inner" style="color:#f6c66b">┄┄</span> Inner measurement guide (drag inner line)</span></div><p class="tiny" id="edgeStatus">Use the outline and guide lines to compare the card borders.</p>
 </div>
-<div class="card hidden" id="cameraCard"><h2>Camera scanner</h2><div class="preview"><video id="video" autoplay playsinline></video><div class="overlay"></div></div><p class="tiny">Place the full card inside the guide. Keep the camera parallel to the card and use even lighting.</p><div class="actions"><button class="btn" onclick="capture()">Capture photo</button><button class="btn ghost" onclick="closeCamera()">Close camera</button></div><canvas id="captureCanvas" class="hidden"></canvas></div>
 
-<section id="centering" class="hidden">
+
+<section id="centering">
 <div class="card"><h2>Centering measurements</h2><p class="tiny">Manual mode: enter each border as a percentage out of 100. Left + right must equal 100, and top + bottom must equal 100. Example: L45 / R55 and T48 / B52.</p>
 <div class="grid"><div class="card"><h2>Front centering</h2><div class="split"><div class="field"><label>Left %</label><input type="number" min="0" max="100" id="fl" value="50"></div><div class="field"><label>Right %</label><input type="number" min="0" max="100" id="fr" value="50"></div><div class="field"><label>Top %</label><input type="number" min="0" max="100" id="ft" value="50"></div><div class="field"><label>Bottom %</label><input type="number" min="0" max="100" id="fb" value="50"></div></div><div id="frontCenter" class="metric"><span>Front centering score</span><b>100 / 100</b></div></div>
 <div class="card"><h2>Back centering</h2><div class="split"><div class="field"><label>Left %</label><input type="number" min="0" max="100" id="bl" value="50"></div><div class="field"><label>Right %</label><input type="number" min="0" max="100" id="br" value="50"></div><div class="field"><label>Top %</label><input type="number" min="0" max="100" id="bt" value="50"></div><div class="field"><label>Bottom %</label><input type="number" min="0" max="100" id="bb" value="50"></div></div><div id="backCenter" class="metric"><span>Back centering score</span><b>100 / 100</b></div></div></div>
@@ -122,7 +122,7 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 <section id="condition" class="hidden">
 <div class="card">
 <h2>AI pre-grade</h2>
-<p class="tiny">Add clear photos of both sides using your camera or photo library. Review the visible condition indicators below, then calculate a preliminary point score out of 10.</p>
+<p class="tiny">Capture or choose clear front and back photos here. Review the visible condition indicators below, then calculate a preliminary point score out of 10.</p>
 <div class="grid">
   <div class="card">
     <h2>Front photo</h2>
@@ -137,6 +137,7 @@ body{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
     <p class="tiny" id="preBackStatus">No back photo added yet. Use the camera or choose a photo.</p>
   </div>
 </div>
+<div class="card hidden" id="cameraCard"><h2>Camera scanner</h2><div class="preview"><video id="video" autoplay playsinline></video><div class="overlay"></div></div><p class="tiny">Place the full card inside the guide. Keep the camera parallel to the card and use even lighting.</p><div class="actions"><button class="btn" onclick="capture()">Capture photo</button><button class="btn ghost" onclick="closeCamera()">Close camera</button></div><canvas id="captureCanvas" class="hidden"></canvas></div>
 <div class="notice">Assessment areas follow the broad principles used by PSA, Beckett (BGS), ACE, CGC and TAG: centering, corners, edges and surface. Each company applies its own criteria, weighting and grading scale. BGS 10 is shown as the highest BGS grade; this shared score is an estimate, not an official company grade.</div>
 <div class="grid">
   <div class="card"><h2>Front condition</h2>
