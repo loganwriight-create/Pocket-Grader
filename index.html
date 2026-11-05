@@ -131,6 +131,19 @@ body[data-theme="purple-yellow"] .edge-live-tag i{background:#ffd84d;box-shadow:
 <div class="edge-workbench-heading"><div><span class="edge-kicker">POCKET GRADER · CENTERING</span><h2>Card alignment studio</h2></div><span class="edge-live-tag"><i></i> EDGE ADJUST</span></div>
 <p class="tiny">Line up the frame with the card’s outside edge, then align the inner guides with the printed border. Drag any guide to fine-tune the measurements.</p>
 <div class="edge-side-control"><label for="edgeSide">CARD SIDE</label><select id="edgeSide"><option value="front">Front</option><option value="back">Back</option></select></div>
+<div class="edge-camera-actions actions" style="display:flex;gap:9px;flex-wrap:wrap;margin:12px 0">
+ <button class="btn" type="button" onclick="openEdgeCamera()"> <span aria-hidden="true">▣</span> Take card photo</button>
+ <button class="btn secondary" type="button" onclick="document.getElementById('edgePhotoLibrary').click()">Choose photo</button>
+ <input id="edgePhotoLibrary" type="file" accept="image/*" capture="environment" style="display:none">
+</div>
+<div id="edgeCameraPanel" class="card hidden" style="padding:12px;margin:10px 0;background:#081a24;border:1px solid var(--line)">
+ <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><b id="edgeCameraTitle">Capture front of card</b><span class="tiny">LIVE CAMERA</span></div>
+ <video id="edgeCameraVideo" autoplay playsinline muted style="display:block;width:100%;max-height:360px;object-fit:contain;border-radius:12px;background:#000"></video>
+ <p class="tiny">Use the rear camera where available. Keep the whole card inside the frame, parallel to the camera, with even lighting.</p>
+ <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" onclick="captureEdgePhoto()">Capture photo</button><button class="btn secondary" type="button" onclick="closeEdgeCamera()">Close camera</button></div>
+ <canvas id="edgeCameraCanvas" class="hidden"></canvas>
+</div>
+<p class="tiny" id="edgeCameraStatus">Take a photo or choose one from your library. It will appear in the alignment frame for edge adjustment.</p>
 <div class="edge-preview-shell"><div class="edge-preview-meta"><span>LIVE CARD FRAME</span><span>63 : 88 RATIO</span></div><div class="preview edge-preview" id="edgePreview" style="width:min(100%,280px);height:390px;aspect-ratio:63/88;margin:0 auto;background:#081a24">
 <span class="muted" id="edgePlaceholder">Scan or upload a card to see its outline here</span>
 <img id="edgeImage" class="hidden" alt="Card edge adjustment preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain">
@@ -315,6 +328,51 @@ function fitOutlineToImage(){
  drawEdges();edgeConfirmed=false;
  $('edgeStatus').textContent='Card outline fitted to the photo. Use the guide lines to compare the borders.';
 }
+let edgeCameraStream=null;
+async function openEdgeCamera(){
+ const panel=$('edgeCameraPanel'),video=$('edgeCameraVideo'),which=$('edgeSide').value;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+   $('edgeCameraStatus').textContent='Live camera is not available in this browser. Use Choose photo instead.';
+   return;
+ }
+ try{
+   closeEdgeCamera();
+   $('edgeCameraTitle').textContent='Capture '+which+' of card';
+   $('edgeCameraStatus').textContent='Requesting camera permission…';
+   edgeCameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
+   video.srcObject=edgeCameraStream;
+   panel.classList.remove('hidden');
+   await video.play();
+   $('edgeCameraStatus').textContent='Camera ready. Position the '+which+' of your card and capture when steady.';
+   panel.scrollIntoView({behavior:'smooth',block:'center'});
+ }catch(err){
+   closeEdgeCamera();
+   $('edgeCameraStatus').textContent=err&&err.name==='NotAllowedError'?'Camera permission was denied. Allow camera access for this site in iPhone Settings or Safari, then try again.':'Could not open the camera. Check browser permissions, or use Choose photo instead.';
+ }
+}
+function closeEdgeCamera(){
+ if(edgeCameraStream){edgeCameraStream.getTracks().forEach(track=>track.stop());edgeCameraStream=null;}
+ const video=$('edgeCameraVideo');if(video)video.srcObject=null;
+ const panel=$('edgeCameraPanel');if(panel)panel.classList.add('hidden');
+}
+function captureEdgePhoto(){
+ const video=$('edgeCameraVideo'),canvas=$('edgeCameraCanvas'),which=$('edgeSide').value;
+ if(!video.videoWidth||!video.videoHeight){$('edgeCameraStatus').textContent='Camera is still starting. Please wait a moment and try again.';return;}
+ canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+ canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+ canvas.toBlob(blob=>{
+   if(!blob){$('edgeCameraStatus').textContent='Could not capture that image. Please try again.';return;}
+   setImage(which,new File([blob],which+'-card.jpg',{type:'image/jpeg'}));
+   $('edgeCameraStatus').textContent=(which==='front'?'Front':'Back')+' photo captured and loaded into the alignment frame.';
+   closeEdgeCamera();
+ },'image/jpeg',.94);
+}
+$('edgePhotoLibrary').addEventListener('change',function(){
+ const file=this.files&&this.files[0],which=$('edgeSide').value;
+ if(file){setImage(which,file);$('edgeCameraStatus').textContent=(which==='front'?'Front':'Back')+' photo selected and loaded into the alignment frame.';}
+ this.value='';
+});
+window.addEventListener('pagehide',closeEdgeCamera);
 function syncEdgeImage(){
  let which=$('edgeSide').value,src=images[which],img=$('edgeImage');
  if(src){img.onload=fitOutlineToImage;img.src=src;img.classList.remove('hidden');$('edgePlaceholder').classList.add('hidden');if(img.complete)fitOutlineToImage();}
