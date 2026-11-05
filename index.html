@@ -442,6 +442,7 @@ function pair(a,b){return Math.max(0,100-Math.abs(a-b));}
 function score(prefix){let a=+$(prefix+'l').value||0,b=+$(prefix+'r').value||0,c=+$(prefix+'t').value||0,d=+$(prefix+'b').value||0;return Math.round((pair(a,b)+pair(c,d))/2);}
 function valid(prefix){let a=+$(prefix+'l').value,b=+$(prefix+'r').value,c=+$(prefix+'t').value,d=+$(prefix+'b').value;return a>=0&&b>=0&&c>=0&&d>=0&&a<=100&&b<=100&&c<=100&&d<=100&&a+b===100&&c+d===100;}
 function updateCenter(){['f','b'].forEach(p=>{let ok=valid(p),el=$(p==='f'?'frontCenter':'backCenter');el.innerHTML='<span>'+(p==='f'?'Front':'Back')+' centering score</span><b>'+(ok?score(p)+' / 100':'Check pairs total 100%')+'</b>';});}
+ renderCenteringGrades();
 ['fl','fr','ft','fb','bl','br','bt','bb'].forEach(id=>$(id).addEventListener('input',updateCenter));
 function syncPreGradePhotos(){
  ['front','back'].forEach(s=>{
@@ -515,6 +516,7 @@ function renderGrades(){
  $('gradeGrid').innerHTML='<div class="gradebox wide"><div class="tiny">COMBINED CONDITION INDICATOR</div><div class="score">'+overall.toFixed(1)+' / 10</div><div class="bar"><span style="width:'+Math.min(100,overall*10)+'%"></span></div><div class="tiny">Centering '+centering.toFixed(0)+'/100 · Visual condition inputs '+condition.toFixed(1)+'/10</div></div>'+(names.filter(n=>selected.includes(n[0])).map(n=>'<div class="gradebox"><div class="tiny">'+n[0]+'</div><div class="grade">'+n[1]+(/(?:^|\s)10$/.test(n[1])?' <span class=\"grade-diamond\" title=\"Perfect 10\" aria-label=\"Perfect 10\">💎</span>':'')+'</div><div class="tiny">'+n[2]+'</div></div>').join('')||'<div class="gradebox">Select one or more graders in Settings to display estimates.</div>');
 }
 ['frontSurface','frontCorners','frontEdges','backSurface','backCorners','backEdges'].forEach(id=>$(id).addEventListener('change',renderGrades));
+document.querySelectorAll('.grader-choice').forEach(el=>el.addEventListener('change',renderCenteringGrades));
 function demo(){[['fl',45],['fr',55],['ft',48],['fb',52],['bl',50],['br',50],['bt',49],['bb',51]].forEach(x=>$(x[0]).value=x[1]);updateCenter();$('scanResult').textContent='Demo measurements loaded. Adjust them to match your card.';}
 function updateEbay(){let parts=[$('cardName').value,$('cardSet').value,$('cardLanguage').value,$('valueGrade').value].filter(Boolean);let q=parts.join(' ');$('ebayLink').href='https://www.ebay.co.uk/sch/i.html?_nkw='+encodeURIComponent(q)+'&LH_Sold=1&LH_Complete=1&_sop=13';$('valueCardQuery').textContent=parts.join(' · ')||'Enter card details in Scan';$('valueSearchHint').textContent=$('cardSet').value?'Search includes the card name, set/number, language and selected grade.':'Add the set number in Scan to narrow the results.';}
 $('cardName').addEventListener('input',updateEbay);$('cardSet').addEventListener('input',updateEbay);$('cardLanguage').addEventListener('change',updateEbay);$('valueGrade').addEventListener('change',updateEbay);
